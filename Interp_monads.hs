@@ -10,6 +10,8 @@ data Term  = Num Int
            | If  Term Term Term
            | Lam String Term
            | App Term Term
+           | Put Int
+           | Get
      deriving (Show, Eq)
 
 data Value  = I { nOf :: Int }
@@ -55,13 +57,17 @@ interp_m (Bool b) _        = ret (B b)
 interp_m (Var v) env       = ret (lookupEnv v env)
 interp_m (If e0 e1 e2) env = my_bind (interp_m e0 env)
                                      (\v0 -> interp_m (if bOf v0 then e1 else e2) env)
-interp_m (Add e1 e2) env   = my_bind (interp m e1 env)
-                                      (\v0 -> nOf v0 + nOf (interp_m e2 env))
--- interp_m (Sub e1 e2) env   = my_bind (interp m e1 env)
---                                      (\v0 -> nOf v0 - nOf (interp_m e2 env))
--- interp_m (Gt e1 e2) env    = my_bind (interp m e1 env)
---                                      (\v0 -> nOf v0 > nOf (interp_m e2 env))
--- interp_m (Lam v e0) env    = ret (\a -> interp_m e0 (extendEnv v a env))
+interp_m (Add e1 e2) env   = (my_bind (interp_m e1 env)
+                                      (\v0 -> (my_bind (interp_m e2 env)
+                                                       (\v1 -> (ret (I (nOf v0 + nOf v1)))))))
+interp_m (Sub e1 e2) env   = (my_bind (interp_m e1 env)
+                                      (\v0 -> (my_bind (interp_m e2 env)
+                                                       (\v1 -> (ret (I (nOf v0 - nOf v1)))))))
+interp_m (Gt e1 e2) env    = (my_bind (interp_m e1 env)
+                                      (\v0 -> (my_bind (interp_m e2 env)
+                                                       (\v1 -> (ret (B (nOf v0 > nOf v1)))))))
+--terp_m (Lam v e0) env    = (\a -> (my_bind (interp_m e0 (extendEnv v a env))
+--                                   (\v0 -> v0)
 -- interp_m (App e0 e1) env   = my_bind (interp_m e0 env)
 --                                      (\v0 -> fOf v0 (interp_m e1 env))
 
