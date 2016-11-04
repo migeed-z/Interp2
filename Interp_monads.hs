@@ -80,7 +80,8 @@ interp_m (Get) env         = m_bind (m_read)
                                     (\v0 -> ret (I v0))
 interp_m (Put i) env       = write i
 
-----tests
+
+----tests----
 
 test :: [Bool]
 
@@ -91,5 +92,7 @@ test = [ 1     == nOf (run (interp_m (Num 1) [])),
          3     == nOf (run (interp_m (If (Bool False) (Num 1) (Num 3)) [])),
          3     == nOf (run (interp_m (App (Lam "x" (Var "x")) (Num 3)) [])),
          3     == nOf (run (interp_m (Var "x") [("x", (I 3))])),
-         5     == nOf (run (interp_m (App (Lam "x" (Get)) (Put 5)) [])) ]
+         5     == nOf (run (interp_m (App (Lam "x" (Get)) (Put 5)) [])),
+         6     == nOf (run (interp_m (Add (Num 1) (App (Lam "x" (Get)) (Put 5))) [])),
+         False == bOf (run (interp_m (Gt (Num 1) (App (Lam "x" (Get)) (Put 5))) [])) ]
 
