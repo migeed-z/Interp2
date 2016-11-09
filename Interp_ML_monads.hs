@@ -45,7 +45,7 @@ m_read i = \s -> ((case (index s i) of
 
 -- Put
 write   :: s -> State s Value
-write x = \s -> (U(()), x:s)
+write x = \s -> (U(()), s ++ [x])
 
 -- Return
 ret   :: a -> State s a
